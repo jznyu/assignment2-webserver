@@ -1,9 +1,18 @@
+# Your web server should: 
+# Accept and parse the HTTP request
+# Get the requested file from the server’s file system
+# Create an HTTP response message consisting of the requested file preceded by header lines
+# Send the response directly to the client. 
+
 # import socket module
 from socket import *
 # In order to terminate the program
 import sys
+# import os
 
-
+# Add debug prints as per the colleague's instructions
+# print(f'Current working directory: {os.getcwd()}')
+# print(f'Files in current directory: {os.listdir()}')
 
 def webServer(port=13331):
   serverSocket = socket(AF_INET, SOCK_STREAM)
@@ -12,6 +21,7 @@ def webServer(port=13331):
   serverSocket.bind(("", port))
   
   #Fill in start
+  serverSocket.listen(1)
 
   #Fill in end
 
@@ -19,37 +29,41 @@ def webServer(port=13331):
     #Establish the connection
     
     print('Ready to serve...')
-    connectionSocket, addr = #Fill in start -are you accepting connections?     #Fill in end
+    connectionSocket, addr = serverSocket.accept()
     
     try:
-      message = #Fill in start -a client is sending you a message   #Fill in end 
-      filename = message.split()[1]
-      
+      message = connectionSocket.recv(1024) # returns bytes
+      decodedMessage = message.decode("utf-8")
+      filename = decodedMessage.split()[1]
+      print(f'filename: {filename}')
       #opens the client requested file. 
       #Plenty of guidance online on how to open and read a file in python. How should you read it though if you plan on sending it through a socket?
-      f = open(filename[1:], #fill in start #fill in end)
+      f = open(filename[1:], 'rb') # keeps data in binary mode
       #fill in end
       
 
       #This variable can store the headers you want to send for any valid or invalid request.   What header should be sent for a response that is ok?    
       #Fill in start 
               
+      outputdata = b"HTTP/1.1 200 OK\r\n"
       #Content-Type is an example on how to send a header as bytes. There are more!
-      outputdata = b"Content-Type: text/html; charset=UTF-8\r\n"
-
+      outputdata += b"Content-Type: text/html; charset=UTF-8\r\n"
+      outputdata += b"\r\n\r\n"
 
       #Note that a complete header must end with a blank line, creating the four-byte sequence "\r\n\r\n" Refer to https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html
  
       #Fill in end
                
       for i in f: #for line in file
-      #Fill in start - append your html file contents #Fill in end 
+      #Fill in start 
+        outputdata += i
+      #  #Fill in end 
         
       #Send the content of the requested file to the client (don't forget the headers you created)!
       #Send everything as one send command, do not send one line/item at a time!
 
       # Fill in start
-
+      connectionSocket.sendall(outputdata)
 
       # Fill in end
         
@@ -60,12 +74,19 @@ def webServer(port=13331):
       # Remember the format you used in the try: block!
       #Fill in start
 
+      error_response = b"HTTP/1.1 404 Not Found\r\n"
+      error_response += b"Content-Type: text/html; charset=UTF-8\r\n"
+      error_response += b"\r\n\r\n"
+      error_response += b"<html><body><h1>404: File not found</h1></body></html>\r\n"
+
+      connectionSocket.sendall(error_response)
+
       #Fill in end
 
 
       #Close client socket
       #Fill in start
-
+      connectionSocket.close()
       #Fill in end
 
   # Commenting out the below (some use it for local testing). It is not required for Gradescope, and some students have moved it erroneously in the While loop. 
