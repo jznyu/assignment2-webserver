@@ -47,6 +47,8 @@ def webServer(port=13331):
               
       outputdata = b"HTTP/1.1 200 OK\r\n"
       #Content-Type is an example on how to send a header as bytes. There are more!
+      outputdata += b"Server: Python/3.x\r\n"
+      outputdata += b"Connection: close\r\n"
       outputdata += b"Content-Type: text/html; charset=UTF-8\r\n"
       outputdata += b"\r\n\r\n"
 
@@ -75,6 +77,8 @@ def webServer(port=13331):
       #Fill in start
 
       error_response = b"HTTP/1.1 404 Not Found\r\n"
+      error_response += b"Server: Python/3.x\r\n"
+      error_response += b"Connection: close\r\n"
       error_response += b"Content-Type: text/html; charset=UTF-8\r\n"
       error_response += b"\r\n\r\n"
       error_response += b"<html><body><h1>404: File not found</h1></body></html>\r\n"
